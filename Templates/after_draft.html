@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>After Draft</title>
+</head>
+<body>
+{% for team in teams %}
+        <p>{{ team }}</p>
+        {% endfor %}
+<h1>Draft Room</h1>
+    <button onclick="location.href='/WeeklyStats'">Sim Week 1</button>
+<button onclick="location.href='/LineupChanges'">Set Lineup</button>
+</body>
+</html>
