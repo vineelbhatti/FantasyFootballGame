@@ -31,7 +31,6 @@ api_key = 'AIzaSyCqJBDynKiv3iPjc1q_S2JAbXkfBBkGi74'
 fantasy_data_2023 = pd.read_csv("FantasyData21-23.csv")
 
 schedules = pd.read_csv("Schedules.csv")
-#schedules = schedules.replace(r'[<@]', '', regex=True)
 
 win_percentage_data = pd.read_csv("WinPercentageData.csv")
 win_percentage_data = win_percentage_data.replace(r'[^\w\s]|_', '', regex=True)
@@ -131,9 +130,6 @@ win_percentage_data['Team'] = win_percentage_data['Team'].map(full_team_names_ma
 fantasy_data_2023.rename(columns={'FantPos':'position'}, inplace=True)
 fantasy_data_2023.rename(columns={'Tm':'Team'}, inplace=True)
 fantasy_data_2023 = fantasy_data_2023.replace(r'[^\w\s]|_', '', regex=True)
-#fantasy_data_2023["TotalYds"] = fantasy_data_2023["Yds"] + fantasy_data_2023["Yds.1"] + fantasy_data_2023["Yds.2"]
-#fantasy_data_2023["TotalTD"] = fantasy_data_2023["TD"] + fantasy_data_2023["TD.1"] + fantasy_data_2023["TD.2"] + fantasy_data_2023["TD.3"]
-#fantasy_data_2023 = fantasy_data_2023.drop(columns=['Yds', 'Yds.1', 'Yds.2', 'TD', 'TD.1', 'TD.2', 'TD.3'])
 fantasy_data_2023['Team'] = fantasy_data_2023['Team'].map(fix_abv).fillna(fantasy_data_2023['Team'])
 fantasy_data_2023 = fantasy_data_2023[fantasy_data_2023.Team != '2TM']
 fantasy_data_2023 = fantasy_data_2023[fantasy_data_2023.Team != '3TM']
@@ -141,7 +137,6 @@ fantasy_data_2023.dropna(subset=['PPR'], inplace=True)
 fantasy_data_2023.fillna(0, inplace=True)
 fantasy_data_2023.dropna(subset=['Team'], inplace=True)
 fantasy_data_2023 = pd.merge(fantasy_data_2023, win_percentage_data, on=['Team', 'Year'], how='left')
-#fantasy_data_2023 = fantasy_data_2023.dropna()
 
 fantasy_data_2023['PPG'] = fantasy_data_2023['PPR']/fantasy_data_2023['G']
 fantasy_data_2023['Cmp/Gm'] = fantasy_data_2023['Cmp']/fantasy_data_2023['G']
@@ -171,61 +166,8 @@ pass_defense['Team'] = pass_defense['Team'].map(complete_team_abbreviation_mappi
 run_defense = pd.read_csv("NFLRunDefenseRankings - Sheet1.csv")
 run_defense.rename(columns={'TEAM':'Team'}, inplace=True)
 run_defense['Team'] = run_defense['Team'].map(complete_team_abbreviation_mapping)
-'''
-enc = LabelEncoder()
-enc.fit(fantasy_data_2023['position'])
-fantasy_data_2023['position_enc'] = enc.transform(fantasy_data_2023['position'])
 
-enc = LabelEncoder()
-enc.fit(fantasy_data_2023['Team'])
-fantasy_data_2023['team_enc'] = enc.transform(fantasy_data_2023['Team'])
-'''
-####################
-
-# Sample dataframe
-# fantasy_data_2023 = pd.read_csv('path_to_your_data.csv')
-
-# Assuming 'player_id' is the unique identifier for each player
-# and 'year' is the column indicating the year
-#stats_columns = ['Y/A', 'Y/R', 'VBD', "RushYds/Gm", "PassYds/Gm", "PassTD/Gm", "RushTD/Gm", "RecYds/Gm", "RecTD/Gm", "Fmb/Gm", "Cmp/Gm", "RushAtt/Gm", "PassAtt/Gm", "Int/Gm", "Tgt/Gm", "Rec/Gm"]
-
-'''
-# Initialize a dictionary to hold new difference columns
-diff_columns = {col: f"{col}_diff_previous_year" for col in stats_columns}
-
-# Initialize the new columns with 0
-for col in diff_columns.values():
-    fantasy_data_2023[col] = 0
-
-# Create dataframes for each year
-df_2021 = fantasy_data_2023[fantasy_data_2023['Year'] == 2021].copy()
-df_2022 = fantasy_data_2023[fantasy_data_2023['Year'] == 2022].copy()
-df_2023 = fantasy_data_2023[fantasy_data_2023['Year'] == 2023].copy()
-
-# Merge dataframes on player_id to find differences
-df_2022 = df_2022.merge(df_2021[['Player'] + stats_columns], on='Player', how='left', suffixes=('', '_prev'))
-df_2023 = df_2023.merge(df_2022[['Player'] + stats_columns], on='Player', how='left', suffixes=('', '_prev'))
-
-# Calculate differences for year 2022
-for col in stats_columns:
-    diff_col = diff_columns[col]
-    df_2022[diff_col] = df_2022[col] - df_2022[f"{col}_prev"]
-
-# Calculate differences for year 2023
-for col in stats_columns:
-    diff_col = diff_columns[col]
-    df_2023[diff_col] = df_2023[col] - df_2023[f"{col}_prev"]
-
-# Update the original dataframe with the new columns
-fantasy_data_2023.update(df_2022[['Player'] + list(diff_columns.values())])
-fantasy_data_2023.update(df_2023[['Player'] + list(diff_columns.values())])
-'''
-
-# Fill NaN values with 0 (if any)
 fantasy_data_2023.fillna(0, inplace=True)
-
-#fantasy_data_2023 = fantasy_data_2023[fantasy_data_2023.PPR >= 100]
-
 
 def determine_stars(ppg):
     if ppg >= 19:
@@ -266,10 +208,10 @@ fantasy_data_2023['GoodTeammates'] = fantasy_data_2023['5StarTeammates'] + fanta
 
 #####################
 qb_data = fantasy_data_2023[fantasy_data_2023['position'] == 'QB']
-qb_data = qb_data[["Player", "position", "StarRating", "GoodTeammates", '5StarTeammates', '4StarTeammates', '3StarTeammates', '2StarTeammates', '1StarTeammates', "Team", "Year", "Age", "PPR", "Y/A", "VBD", "RushYds/Gm", "PassYds/Gm", "PassTD/Gm", "RushTD/Gm", "Fmb/Gm", "Cmp/Gm", "PassAtt/Gm", "Int/Gm", "RushAtt/Gm", "W-L%", "PF", "SRS", "OSRS"]]
+qb_data = qb_data[["Player", "GS", "position", "StarRating", "GoodTeammates", '5StarTeammates', '4StarTeammates', '3StarTeammates', '2StarTeammates', '1StarTeammates', "Team", "Cmp", "PassAtt", "Year", "Age", "PPR", "Y/A", "VBD", "RushYds/Gm", "PassYds/Gm", "PassTD/Gm", "RushTD/Gm", "Fmb/Gm", "Cmp/Gm", "PassAtt/Gm", "Int/Gm", "RushAtt/Gm", "W-L%", "PF", "SRS", "OSRS"]]
 pos_to_keep = ['RB', 'FB']
 rbfb_data = fantasy_data_2023[fantasy_data_2023['position'].isin(pos_to_keep)]
-rbfb_data = rbfb_data[["Player", "position", "StarRating", "GoodTeammates", '5StarTeammates', '4StarTeammates', '3StarTeammates', '2StarTeammates', '1StarTeammates', "Team", "Year", "Age", "PPR", "Y/A", "RushYds/Gm", "Tgt/Gm", "Rec/Gm", "RushTD/Gm", "RecYds/Gm", "RecTD/Gm", "Fmb/Gm", "RushAtt/Gm", "W-L%", "PF", "SRS", "OSRS"]]
+rbfb_data = rbfb_data[["Player", "position", "StarRating", "GoodTeammates", '5StarTeammates', '4StarTeammates', '3StarTeammates', '2StarTeammates', '1StarTeammates', "Team", "Year", "Age", "PPR", "Y/A", "RushYds/Gm", "RushAtt", "Tgt/Gm", "Rec/Gm", "RushTD/Gm", "RecYds/Gm", "RecTD/Gm", "Fmb/Gm", "RushAtt/Gm", "W-L%", "PF", "SRS", "OSRS"]]
 pos_to_keep = ['WR', 'TE']
 wrte_data = fantasy_data_2023[fantasy_data_2023['position'].isin(pos_to_keep)]
 wrte_data = wrte_data[["Player", "position", "StarRating", "GoodTeammates", '5StarTeammates', '4StarTeammates', '3StarTeammates', '2StarTeammates', '1StarTeammates', "Team", "Year", "Age", "PPR", "Tgt/Gm", "Rec/Gm", "RecYds/Gm", "RecTD/Gm", "Fmb/Gm", "Y/R", "W-L%", "PF", "SRS", "OSRS"]]
@@ -297,8 +239,10 @@ def add_wr_quality_to_qb_data(qb_df, wrte_df):
 
 qb_data = add_wr_quality_to_qb_data(qb_data, wrte_data)
 
+qb_data['Cmp%'] = qb_data['Cmp']/qb_data['PassAtt']
+
 #These features are for QB
-features_qb = ['wr_quality', "GoodTeammates", "RushYds/Gm", "PassYds/Gm", "PassTD/Gm", "RushTD/Gm", "Cmp/Gm", "PassAtt/Gm", "Int/Gm", "RushAtt/Gm", "W-L%"]
+features_qb = ['wr_quality', "RushYds/Gm", "PassYds/Gm", "PassTD/Gm", "Cmp%", "PassAtt", "GS"]
 #features_qb += [f"{stat_qb}_diff_previous_year" for stat_qb in features_qb]
 target = "PPR"
 
@@ -321,8 +265,6 @@ mse = mean_squared_error(y_test_qb, y_pred_qb)
 #r2 = r2_score(y_test, y_pred)
 
 print(f'QB Mean Absolute Error: {mae}')
-#print(f'QB Mean Squared Error: {mse}')
-#print(f'QB R^2 Score: {r2}')
 
 df_2023_predictions_qb = pd.DataFrame()
 df_2023_predictions_qb['y_test'] = y_test_qb
@@ -335,18 +277,15 @@ qb_data.loc[qb_data['Year'] == 2023, 'PredPts'] = y_2024_pred_qb
 #print(df_2023_predictions_qb.head(10))
 qb_data = qb_data.sort_values('PredPts', ascending=False)
 #print(qb_data.head(10))
-#print(features_qb)
-#print(model_qb.feature_importances_)
+print(features_qb)
+print(model_qb.feature_importances_)
 
 #############################################
 
-#print(rbfb_data[rbfb_data['Team'] == "SF"])
-#print(rbfb_data[['Player', 'PPR', 'StarRating', '5StarTeammates', '4StarTeammates']].head(50))
-
 #These features are for RB
-features_rb = ["GoodTeammates", "Y/A", "RushYds/Gm", "RushTD/Gm", "Rec/Gm", "RecYds/Gm", "RecTD/Gm", "Fmb/Gm", "RushAtt/Gm", "W-L%"]
+features_rb = ["GoodTeammates", "RushYds/Gm", "RushTD/Gm", "Rec/Gm", "RecYds/Gm", "RushAtt/Gm", "Y/A", "RushAtt"]
 #features_rb += [f"{stat_rb}_diff_previous_year" for stat_rb in features_rb]
-features_rb += ["Age"]
+#features_rb += ["Age"]
 target = "PPR"
 
 train_data_rb = rbfb_data[rbfb_data['Year'] != 2023]
@@ -364,12 +303,8 @@ model_rb.fit(X_train_rb, y_train_rb)
 y_pred_rb = model_rb.predict(X_test_rb)
 
 mae_rb = mean_absolute_error(y_test_rb, y_pred_rb)
-mse_rb = mean_squared_error(y_test_rb, y_pred_rb)
-#r2 = r2_score(y_test, y_pred)
 
 print(f'RB Mean Absolute Error: {mae_rb}')
-#print(f'RB Mean Squared Error: {mse_rb}')
-#print(f'QB R^2 Score: {r2}')
 
 df_2023_predictions_rb = pd.DataFrame()
 df_2023_predictions_rb['y_test_rb'] = y_test_rb
@@ -379,7 +314,6 @@ X_2023_rb = rbfb_data[rbfb_data['Year'] == 2023][features_rb]
 y_2024_pred_rb = model_rb.predict(X_2023_rb)
 rbfb_data.loc[rbfb_data['Year'] == 2023, 'PredPts'] = y_2024_pred_rb
 
-#print(df_2023_predictions_rb.head(10))
 rbfb_data = rbfb_data.sort_values('PredPts', ascending=False)
 #print(rbfb_data.head(10))
 #print(features_rb)
@@ -388,7 +322,7 @@ rbfb_data = rbfb_data.sort_values('PredPts', ascending=False)
 #############################################
 
 #These features are for WR
-features_wr = ["GoodTeammates", "Tgt/Gm", "Rec/Gm", "RecYds/Gm", "RecTD/Gm", "Y/R", "W-L%"]
+features_wr = ["GoodTeammates", "Tgt/Gm", "Rec/Gm", "RecYds/Gm", "RecTD/Gm", "Y/R"]
 #features_wr += [f"{stat_wr}_diff_previous_year" for stat_wr in features_wr]
 features_wr += ["Age"]
 target = "PPR"
@@ -517,6 +451,75 @@ def home():
 @app.route('/after_draft', methods=['GET', 'POST'])
 def show_teams():
     return render_template('after_draft.html', teams=teams)
+
+@app.route('/TierList', methods=['GET','POST'])
+def view_tier_list():
+    team_colors = {
+        'ARI': {'primary': '#97233F', 'secondary': '#FFB612'},
+        'ATL': {'primary': '#A71930', 'secondary': '#000000'},
+        'BAL': {'primary': '#241773', 'secondary': '#9E7C0C'},
+        'BUF': {'primary': '#00338D', 'secondary': '#C60C30'},
+        'CAR': {'primary': '#0085CA', 'secondary': '#101820'},
+        'CHI': {'primary': '#C83803', 'secondary': '#0B162A'},
+        'CIN': {'primary': '#FB4F14', 'secondary': '#000000'},
+        'CLE': {'primary': '#311D00', 'secondary': '#FF3C00'},
+        'DAL': {'primary': '#041E42', 'secondary': '#869397'},
+        'DEN': {'primary': '#FB4F14', 'secondary': '#002244'},
+        'DET': {'primary': '#0076B6', 'secondary': '#B0B7BC'},
+        'GB': {'primary': '#203731', 'secondary': '#FFB612'},
+        'HOU': {'primary': '#03202F', 'secondary': '#A71930'},
+        'IND': {'primary': '#002C5F', 'secondary': '#A5ACAF'},
+        'JAX': {'primary': '#006778', 'secondary': '#D7A22A'},
+        'KC': {'primary': '#E31837', 'secondary': '#FFB81C'},
+        'LV': {'primary': '#A5ACAF', 'secondary': '#000000'},
+        'LAC': {'primary': '#0073CF', 'secondary': '#FFC20E'},
+        'LAR': {'primary': '#003594', 'secondary': '#FFA300'},
+        'MIA': {'primary': '#008E97', 'secondary': '#FC4C02'},
+        'MIN': {'primary': '#4F2683', 'secondary': '#FFC62F'},
+        'NE': {'primary': '#002244', 'secondary': '#C60C30'},
+        'NO': {'primary': '#D3BC8D', 'secondary': '#101820'},
+        'NYG': {'primary': '#0B2265', 'secondary': '#A71930'},
+        'NYJ': {'primary': '#125740', 'secondary': '#000000'},
+        'PHI': {'primary': '#004C54', 'secondary': '#A5ACAF'},
+        'PIT': {'primary': '#FFB612', 'secondary': '#101820'},
+        'SF': {'primary': '#AA0000', 'secondary': '#B3995D'},
+        'SEA': {'primary': '#002244', 'secondary': '#69BE28'},
+        'TB': {'primary': '#D50A0A', 'secondary': '#FF7900'},
+        'TEN': {'primary': '#4B92DB', 'secondary': '#C8102E'},
+        'WSH': {'primary': '#773141', 'secondary': '#FFB612'}
+    }
+    players = {star: fantasy_data_2023[fantasy_data_2023['StarRating'] == star]['Player'].tolist() for star in range(1, 6)}
+    teams = {row['Player']: row['Team'] for _, row in fantasy_data_2023.iterrows()}
+    return render_template('TierList.html', players=players, team_colors=team_colors, teams=teams)
+
+
+@app.route('/player/<player_name>')
+def player_details(player_name):
+    player_data = fantasy_data_2023[fantasy_data_2023['Player'] == player_name].iloc[0]
+    player_image = fetch_player_image(player_name)
+    fantasy_team = "FA"
+    team_num = 0
+    for team in teams:
+        for player in team:
+            if player == player_name:
+                fantasy_team = team_num
+        team_num+=1
+    return render_template('player_details.html', player_name=player_name, player_image=player_image, total_pts=player_data['TotalPts'], fantasy_team=fantasy_team)
+
+
+def fetch_player_image(player_name):
+    search_query = f'{player_name} headshot'
+    search_url = f'https://www.bing.com/images/search?q={search_query}'
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
+    response = requests.get(search_url, headers=headers)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    image = soup.find('img', {'class': 'mimg'})
+    if image:
+        return image['src']
+    else:
+        return None
 
 @app.route('/WaiverClaims', methods=['GET', 'POST'])
 def waiver_claims():
