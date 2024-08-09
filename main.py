@@ -165,6 +165,21 @@ fantasy_data_2023['RecYds/Gm'] = fantasy_data_2023['RecYds']/fantasy_data_2023['
 fantasy_data_2023['RecTD/Gm'] = fantasy_data_2023['RecTD']/fantasy_data_2023['G']
 fantasy_data_2023['Fmb/Gm'] = fantasy_data_2023['Fmb']/fantasy_data_2023['G']
 
+fantasy_data['PPG'] = fantasy_data['PPR']/fantasy_data['G']
+fantasy_data['Cmp/Gm'] = fantasy_data['Cmp']/fantasy_data['G']
+fantasy_data['PassYds/Gm'] = fantasy_data['PassYds']/fantasy_data['G']
+fantasy_data['PassTD/Gm'] = fantasy_data['PassTD']/fantasy_data['G']
+fantasy_data['Int/Gm'] = fantasy_data['Int']/fantasy_data['G']
+fantasy_data['PassAtt/Gm'] = fantasy_data['PassAtt']/fantasy_data['G']
+fantasy_data['RushAtt/Gm'] = fantasy_data['RushAtt']/fantasy_data['G']
+fantasy_data['RushYds/Gm'] = fantasy_data['RushYds']/fantasy_data['G']
+fantasy_data['RushTD/Gm'] = fantasy_data['RushTD']/fantasy_data['G']
+fantasy_data['Tgt/Gm'] = fantasy_data['Tgt']/fantasy_data['G']
+fantasy_data['Rec/Gm'] = fantasy_data['Rec']/fantasy_data['G']
+fantasy_data['RecYds/Gm'] = fantasy_data['RecYds']/fantasy_data['G']
+fantasy_data['RecTD/Gm'] = fantasy_data['RecTD']/fantasy_data['G']
+fantasy_data['Fmb/Gm'] = fantasy_data['Fmb']/fantasy_data['G']
+
 
 player_teams = pd.read_csv("NFLTeams - Sheet1.csv")
 player_teams['Team'] = player_teams['Team'].map(complete_team_abbreviation_mapping)
@@ -395,7 +410,7 @@ fantasy_data_2023['TotalPts'] = 0
 fantasy_data_2023['AvgPts'] = 0
 fantasy_data_2023['weekly_pred_pts'] = 0
 fantasy_data_2023['GP'] = 0
-fantasy_data_2023['TeammatesInjured'] = 0
+fantasy_data_2023['GamesBoosted'] = 0
 fantasy_data_2023['Starting'] = "No"
 fantasy_data_2023['FantasyTeam'] = "FA"
 
@@ -411,6 +426,8 @@ teams_need = [["QB", "WR", "WR", "RB", "RB"], ["QB", "WR", "WR", "RB", "RB"], ["
 team_points = [0, 0, 0, 0, 0, 0, 0, 0]
 team_weekly_points = [0, 0, 0, 0, 0, 0, 0, 0]
 team_wins = [0, 0, 0, 0, 0, 0, 0, 0]
+waiver_order = [7, 6, 5, 4, 3, 2, 1, 0]
+waiver_claims = ["", "", "", "", "", "", "", ""]
 draft_message = ""
 drafted_players = []
 html_table = draft_board.to_html()
@@ -450,38 +467,101 @@ def round_robin_schedule(teams_by_num):
     return schedule
 
 
+def redistribute_stats_for_player(df, player_name, GamesInjured):
+    player = df[df['Player'] == player_name].iloc[0]
+    team = player['Team']
+    position = player['position']
+    tgt_gm = player['Tgt/Gm']
+    rec_gm = player['Rec/Gm']
+    rush_att = player['RushAtt/Gm']
+    rush_yds = rush_att * player['Y/A']
+    pass_att = player['PassAtt/Gm']
 
-def redistribute_stats(df):
-    for index, player in df.iterrows():
-        if player['Injury'] > 0:
-            team = player['Team']
-            position = player['position']
-            tgt_gm = player['Tgt/Gm']
-            rec_gm = player['Rec/Gm']
-            rush_att = player['RushAtt/Gm']
-            pass_att = player['PassAtt/Gm']
-            teammates = df[(df['Team'] == team) &
-                           (df['position'] == position) &
-                           (df['Player'] != player['Player'])]
+    teammates = df[(df['Team'] == team) &
+                   (df['position'] == position) &
+                   (df['Player'] != player_name)]
 
-            num_teammates = len(teammates)
+    num_teammates = len(teammates)
 
-            if num_teammates > 0:
-                random_proportions = np.random.rand(num_teammates)
-                random_proportions /= random_proportions.sum()
+    if num_teammates > 0:
+        random_proportions = np.random.rand(num_teammates)
+        random_proportions /= random_proportions.sum()
+        if df.loc[teammates.index, 'GamesBoosted'].values[0] < GamesInjured+1:
+            df.loc[teammates.index, 'GamesBoosted'] = GamesInjured+1
+        df.loc[teammates.index, 'Tgt/Gm'] += tgt_gm * random_proportions
+        df.loc[teammates.index, 'Rec/Gm'] += rec_gm * random_proportions
+        df.loc[teammates.index, 'RushAtt/Gm'] += rush_att * random_proportions
+        df.loc[teammates.index, 'RushYds/Gm'] += rush_yds * random_proportions
+        df.loc[teammates.index, 'PassAtt/Gm'] += pass_att * random_proportions
 
-                df.loc[teammates.index, 'Tgt/Gm'] += tgt_gm * random_proportions
-                df.loc[teammates.index, 'Rec/Gm'] += rec_gm * random_proportions
-                df.loc[teammates.index, 'RushAtt/Gm'] += rush_att * random_proportions
-                df.loc[teammates.index, 'PassAtt/Gm'] += pass_att * random_proportions
-
-                for i, proportion in zip(teammates.index, random_proportions):
-                    df.at[i, 'RecYds/Gm'] += rec_gm * proportion * df.at[i, 'Y/R']
-                for i, proportion in zip(teammates.index, random_proportions):
-                    df.at[i, 'RushYds/Gm'] += rush_att * proportion * df.at[i, 'Y/A']
-
+        for i, proportion in zip(teammates.index, random_proportions):
+            df.at[i, 'RecYds/Gm'] += rec_gm * proportion * df.at[i, 'Y/R']
+        for i, proportion in zip(teammates.index, random_proportions):
+            df.at[i, 'RushYds/Gm'] += rush_att * proportion * df.at[i, 'Y/A']
     return df
 
+def check_boosts(df):
+    for index, player in df.iterrows():
+        if player['GamesBoosted'] <= 0:
+            columns_to_update = ["Tgt/Gm", "Rec/Gm", "RushAtt/Gm", "RushYds/Gm", "PassAtt/Gm"]
+            for column in columns_to_update:
+                matching_value = fantasy_data.loc[
+                    (fantasy_data['Player'] == player['Player']) &
+                    (fantasy_data['Year'] == 2023),
+                    column
+                ]
+            if not matching_value.empty:
+                fantasy_data_2023.loc[
+                    (fantasy_data_2023['Player'] == player['Player']) &
+                    (fantasy_data_2023['Year'] == 2023),
+                    "Tgt/Gm"
+                ] = fantasy_data.loc[
+                    (fantasy_data['Player'] == player['Player']) &
+                    (fantasy_data['Year'] == 2023),
+                    "Tgt/Gm"
+                ].values[0]
+
+                fantasy_data_2023.loc[
+                    (fantasy_data_2023['Player'] == player['Player']) &
+                    (fantasy_data_2023['Year'] == 2023),
+                    "Rec/Gm"
+                ] = fantasy_data.loc[
+                    (fantasy_data['Player'] == player['Player']) &
+                    (fantasy_data['Year'] == 2023),
+                    "Rec/Gm"
+                ].values[0]
+
+                fantasy_data_2023.loc[
+                    (fantasy_data_2023['Player'] == player['Player']) &
+                    (fantasy_data_2023['Year'] == 2023),
+                    "RushAtt/Gm"
+                ] = fantasy_data.loc[
+                    (fantasy_data['Player'] == player['Player']) &
+                    (fantasy_data['Year'] == 2023),
+                    "RushAtt/Gm"
+                ].values[0]
+
+                fantasy_data_2023.loc[
+                    (fantasy_data_2023['Player'] == player['Player']) &
+                    (fantasy_data_2023['Year'] == 2023),
+                    "RushYds/Gm"
+                ] = fantasy_data.loc[
+                    (fantasy_data['Player'] == player['Player']) &
+                    (fantasy_data['Year'] == 2023),
+                    "RushYds/Gm"
+                ].values[0]
+
+                fantasy_data_2023.loc[
+                    (fantasy_data_2023['Player'] == player['Player']) &
+                    (fantasy_data_2023['Year'] == 2023),
+                    "PassAtt/Gm"
+                ] = fantasy_data.loc[
+                    (fantasy_data['Player'] == player['Player']) &
+                    (fantasy_data['Year'] == 2023),
+                    "PassAtt/Gm"
+                ].values[0]
+
+        return df
 
 
 teams_by_num = list(range(8))
@@ -566,8 +646,64 @@ def fetch_player_image(player_name):
         return None
 
 @app.route('/WaiverClaims', methods=['GET', 'POST'])
-def waiver_claims():
-    return render_template('WaiverClaims.html')
+def make_waiver_claim():
+    global user_team
+    if request.method == 'POST':
+        player_name = request.form['player_name']
+        player = draft_board[draft_board['Player'] == player_name].to_dict('records')
+        i = waiver_order.index(user_team)
+        if player:
+            waiver_claims[i] = player_name
+    auto_waiver_claim()
+    print(waiver_claims)
+    return render_template('WaiverClaims.html', table=draft_board[['Player', 'position', 'Team', 'PredPts', 'PredAvgPts', 'StarRating']].to_html())
+
+def auto_waiver_claim():
+    global waiver_order
+    global waiver_claims
+    global teams
+    global draft_board
+    draft_board = pd.merge(draft_board, fantasy_data_2023[['Player', 'AvgPts']], on='Player', how='left')
+    draft_board = draft_board.drop('AvgPts_x', axis=1)
+    draft_board['AvgPts'] = draft_board['AvgPts_y']
+    draft_board = draft_board.drop('AvgPts_y', axis=1)
+    team_num = 1
+    for team in teams[1:]:
+        team_min = 500
+        weakest_position = ""
+        for player in team:
+            if fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "AvgPts"].values[0] < team_min:
+                team_min = fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "AvgPts"].values[0]
+                weakest_position = fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "position"].values[0]
+        i = waiver_order.index(team_num)
+        for index, row in draft_board.iterrows():
+            if row['position'] == weakest_position and row['AvgPts'] < team_min:
+                print(i)
+                print(waiver_claims[i])
+                waiver_claims[i] = row['Player']
+                break
+            waiver_claims[i] = ""
+        team_num+=1
+
+@app.route('/WaiverResults', methods=['GET', 'POST'])
+def assign_waiver_claims():
+    global waiver_order
+    global waiver_claims
+    global draft_board
+    claim_num = 0
+    successful_waivers = []
+    for claim in waiver_claims:
+        if (draft_board['Player'] == claim).any():
+            teams[waiver_order[claim_num]].append(claim)
+            successful_waivers.append(draft_board['Player'])
+            draft_board = draft_board[draft_board.Player != claim]
+            team_num = waiver_order.pop(claim_num)
+            claim_num-=1
+            waiver_order.append(team_num)
+            print(waiver_order)
+            print(teams)
+        claim_num+=1
+    return render_template('WaiverResults.html', teams=teams)
 
 @app.route('/LineupChanges', methods=['GET', 'POST'])
 def set_lineup():
@@ -671,6 +807,7 @@ def sim_week():
     current_week+=1
     fantasy_data_2023['GP'] += 1
     fantasy_data_2023['Injury']-=1
+    fantasy_data_2023['GamesBoosted'] -= 1
     team_num = 0
     team_weekly_points = [0, 0, 0, 0, 0, 0, 0, 0]
     weather_note = "Good conditions"
@@ -681,10 +818,10 @@ def sim_week():
     if current_week > 1:
         fantasy_data_2023['StarRating'] = fantasy_data_2023.apply(
             lambda row: determine_stars(row['AvgPts'], row['Injury']), axis=1)
+    fantasy_data_2023 = check_boosts(fantasy_data_2023)
     fantasy_data_2023 = count_star_teammates(fantasy_data_2023)
     fantasy_data_2023['GoodTeammates'] = fantasy_data_2023['5StarTeammates'] + fantasy_data_2023['4StarTeammates'] + \
                                          fantasy_data_2023['3StarTeammates']
-    fantasy_data_2023 = redistribute_stats(fantasy_data_2023)
     for index, row in fantasy_data_2023.iterrows():
         player = row['Player']
         sim_player_points(player)
@@ -705,8 +842,9 @@ def sim_week():
     players_points = fantasy_data_2023.groupby('FantasyTeam').apply(
         lambda x: x[['Player', 'Wk' + str(current_week) + 'Pts']].to_dict(orient='records')).to_dict()
     update_winners()
-    fantasy_data_2023.sort_values(by='Wk' + str(current_week) + 'Pts')
-    return render_template('WeeklyStats.html', table=fantasy_data_2023[['Player', 'position', str("Wk" + str(current_week)+"Pts"), 'TotalPts', 'Injury', 'GameNotes', 'Starting', 'StarRating', 'GoodTeammates', 'TeammatesInjured']].to_html(), dfteam_0=dfteam_0_html, team_wins=team_wins, current_week=str(current_week), intcurrent_week=int(current_week), matchups=schedule[current_week-1], team_points=team_points,team_weekly_points=team_weekly_points, players_points=players_points)
+    fantasy_data_2023 = fantasy_data_2023.sort_values(by='Wk' + str(current_week) + 'Pts', ascending=False)
+    #print(fantasy_data_2023[['Player', 'RushYds/Gm', 'RushTD/Gm', 'RecYds/Gm', 'RecTD/Gm', 'Rec/Gm']].head(20))
+    return render_template('WeeklyStats.html', table=fantasy_data_2023[['Player', 'position', str("Wk" + str(current_week)+"Pts"), 'TotalPts', 'Injury', 'GameNotes', 'StarRating', 'GamesBoosted']].to_html(), dfteam_0=dfteam_0_html, team_wins=team_wins, current_week=str(current_week), intcurrent_week=int(current_week), matchups=schedule[current_week-1], team_points=team_points,team_weekly_points=team_weekly_points, players_points=players_points)
 
 def update_winners():
     global schedule
@@ -777,33 +915,68 @@ def sim_player_points(player):
     #points_scored = round(((fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "PredPts"].values[0] / 17) * (
           #      1 - (opponent_ranking / 100)) + random.randint(-10, 10) + weather_impact + home_impact), 1)
     if fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "position"].values[0] == 'QB':
+        if opponent_ranking <= 10:
+            fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "Cmp%"]*=random.uniform(0.7, 1)
+            fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "PassYds/Gm"] *= random.uniform(0.7, 1)
+            fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "PassTD/Gm"] *= random.uniform(0.7, 1)
+        elif opponent_ranking >= 20:
+            fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "Cmp%"]*=random.uniform(1, 1.2)
+            fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "PassYds/Gm"] *= random.uniform(1, 1.2)
+            fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "PassTD/Gm"] *= random.uniform(1, 1.2)
+        fantasy_data_2023[features_qb] = fantasy_data_2023[features_qb].round(0)
         points_scored = model_qb.predict(fantasy_data_2023[fantasy_data_2023['Player'] == player][features_qb])[0]
     elif fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "position"].values[0] == 'RB' or fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "position"].values[0] == 'FB':
+        if opponent_ranking <= 10:
+            fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "Y/A"]*=random.uniform(0.7, 1)
+            fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "RushYds/Gm"] *= random.uniform(0.7, 1)
+            fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "RushTD/Gm"] *= random.uniform(0.7, 1)
+        elif opponent_ranking >= 20:
+            fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "Y/A"]*=random.uniform(1, 1.2)
+            fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "RushYds/Gm"] *= random.uniform(1, 1.2)
+            fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "RushTD/Gm"] *= random.uniform(1, 1.2)
+        fantasy_data_2023[features_rb] = fantasy_data_2023[features_rb].round(0)
         points_scored = model_rb.predict(fantasy_data_2023[fantasy_data_2023['Player'] == player][features_rb])[0]
     elif fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "position"].values[0] == 'WR' or fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "position"].values[0] == 'TE':
+        if opponent_ranking <= 10:
+            fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "Y/R"]*=random.uniform(0.7, 1)
+            fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "RecYds/Gm"] *= random.uniform(0.7, 1)
+            fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "RecTD/Gm"] *= random.uniform(0.7, 1)
+        elif opponent_ranking >= 20:
+            fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "Y/R"]*=random.uniform(1, 1.2)
+            fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "RecYds/Gm"] *= random.uniform(1, 1.2)
+            fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "RecTD/Gm"] *= random.uniform(1, 1.2)
+        fantasy_data_2023[features_wr] = fantasy_data_2023[features_wr].round(0)
         points_scored = model_wr.predict(fantasy_data_2023[fantasy_data_2023['Player'] == player][features_wr])[0]
 
     #Injuries
     if fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "Injury"].values[0] > 0:
         points_scored = 0
         fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "GP"]-=1
-    injury_chance = random.randint(0, 10)
+    if fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "PredAvgPts"].values[0] < 5:
+        injury_chance = random.randint(0, 50)
+    else:
+        injury_chance = random.randint(0, 20)
     if injury_chance < 2:
         fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "StarRating"] = 0
         if random.randint(0, 10) <= 1:
             fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, 'Injury'] = 18
+            fantasy_data_2023 = redistribute_stats_for_player(fantasy_data_2023, player, 18)
             new_injury = "Season ending injury"
         elif random.randint(0, 10) <= 3:
             fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, 'Injury'] = 10
+            fantasy_data_2023 = redistribute_stats_for_player(fantasy_data_2023, player, 10)
             new_injury = "Severe injury"
         elif random.randint(0, 10) <= 5:
             fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, 'Injury'] = 5
+            fantasy_data_2023 = redistribute_stats_for_player(fantasy_data_2023, player, 5)
             new_injury = "Moderate injury"
         elif random.randint(0, 10) <= 7:
             fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, 'Injury'] = 3
+            fantasy_data_2023 = redistribute_stats_for_player(fantasy_data_2023, player, 3)
             new_injury = "Mild injury"
         else:
             fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, 'Injury'] = 1
+            fantasy_data_2023 = redistribute_stats_for_player(fantasy_data_2023, player, 1)
             new_injury = "Day-to-day injury"
         game_notes += (", " + new_injury)
 
