@@ -41,6 +41,10 @@ with open('model_rb.pkl', 'rb') as file:
 with open('model_wr.pkl', 'rb') as file:
     model_wr = pickle.load(file)
 
+rookie_data = pd.read_csv("NFLRookieData.csv")
+fantasy_positions = ['QB', 'RB', 'FB', 'WR', 'TE']
+rookie_data = rookie_data[rookie_data['position'].isin(fantasy_positions)]
+
 schedules = pd.read_csv("Schedules.csv")
 
 win_percentage_data = pd.read_csv("WinPercentageData.csv")
@@ -180,6 +184,147 @@ fantasy_data['RecYds/Gm'] = fantasy_data['RecYds']/fantasy_data['G']
 fantasy_data['RecTD/Gm'] = fantasy_data['RecTD']/fantasy_data['G']
 fantasy_data['Fmb/Gm'] = fantasy_data['Fmb']/fantasy_data['G']
 
+fantasy_data['DevTrait'] = "None"
+fantasy_data['DevSpeed'] = "N/A"
+
+rookie_data['ProspectLevel'] = ""
+rookie_data['GS'] = 17
+rookie_data['PassYds/Gm'] = 0
+rookie_data['PassTD/Gm'] = 0
+rookie_data['PassAtt/Gm'] = 0
+rookie_data['Cmp%'] = 0
+rookie_data['RushYds/Gm'] = 0
+rookie_data['RushTD/Gm'] = 0
+rookie_data['Rec/Gm'] = 0
+rookie_data['RecYds/Gm'] = 0
+rookie_data['Y/A'] = 0
+rookie_data['RushAtt/Gm'] = 0
+rookie_data['RushAtt'] = 0
+rookie_data['Tgt/Gm'] = 0
+rookie_data['RecTD/Gm'] = 0
+rookie_data['Y/R'] = 0
+rookie_data['Year'] = 2023
+rookie_data['DevTrait'] = "None"
+rookie_data['DevSpeed'] = "N/A"
+
+dev_levels = ['None', 'Slow', 'Medium', 'Fast', 'Superstar']
+qb_dev_styles = ['Gunslinger', 'Improviser', 'Precision Passer', 'Escape Artist', 'Field General']
+rb_dev_styles = ['Workhorse', 'Explosive Rusher', 'Backfield Reciever', 'Balanced Back', 'Unstoppable Force']
+wr_dev_styles = ['Deep Threat', 'Playmaker', 'Redzone Threat', 'Balanced Reciever', 'Matchup Nightmare']
+for index, player in rookie_data.iterrows():
+    if int(player['Pick']) <= 15:
+        rookie_data.loc[(rookie_data['Player'] == player['Player']), "ProspectLevel"] = "Top"
+        dev_level = ""
+        level_num = random.randint(0, 10)
+        if level_num <= 1:
+            dev_level = 'None'
+        elif level_num <= 3:
+            dev_level = 'Slow'
+        elif level_num <= 5:
+            dev_level = 'Medium'
+        elif level_num <= 7:
+            dev_level = 'Fast'
+        else:
+            dev_level = 'Superstar'
+        rookie_data.loc[(rookie_data['Player'] == player['Player']), "DevSpeed"] = dev_level
+        if player['position'] == 'QB':
+            if dev_level != 'None':
+                rookie_data.loc[(rookie_data['Player'] == player['Player']), "DevTrait"] = random.choice(qb_dev_styles)
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "PassYds/Gm"] = 170
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "PassTD/Gm"] = 1
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "PassAtt/Gm"] = 25
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "Cmp%"] = 0.6
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "RushYds/Gm"] = 1
+        elif player['position'] == 'RB' or player['position'] == 'FB':
+            if dev_level != 'None':
+                rookie_data.loc[(rookie_data['Player'] == player['Player']), "DevTrait"] = random.choice(rb_dev_styles)
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "RushYds/Gm"] = 40
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "RushTD/Gm"] = 0.2
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "RushAtt/Gm"] = 10
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "Rec/Gm"] = 1
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "RecYds/Gm"] = 7
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "Y/A"] = 3
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "RushAtt"] = 170
+        elif player['position'] == 'WR' or player['position'] == 'TE':
+            if dev_level != 'None':
+                rookie_data.loc[(rookie_data['Player'] == player['Player']), "DevTrait"] = random.choice(wr_dev_styles)
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "Tgt/Gm"] = 6
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "Rec/Gm"] = 4
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "RecYds/Gm"] = 37
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "RecTD/Gm"] = 0.2
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "Y/R"] = 7
+    elif int(player['Pick']) < 100:
+        rookie_data.loc[(rookie_data['Player'] == player['Player']), "ProspectLevel"] = "Middle"
+        dev_level = ""
+        level_num = random.randint(0, 10)
+        if level_num <= 2:
+            dev_level = 'None'
+        elif level_num <= 4:
+            dev_level = 'Slow'
+        elif level_num <= 6:
+            dev_level = 'Medium'
+        elif level_num <= 8:
+            dev_level = 'Fast'
+        else:
+            dev_level = 'Superstar'
+        rookie_data.loc[(rookie_data['Player'] == player['Player']), "DevSpeed"] = dev_level
+        if player['position'] == 'RB' or player['position'] == 'FB':
+            if dev_level != 'None':
+                rookie_data.loc[(rookie_data['Player'] == player['Player']), "DevTrait"] = random.choice(rb_dev_styles)
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "RushYds/Gm"] = 20
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "RushTD/Gm"] = 0.1
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "RushAtt/Gm"] = 5
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "Rec/Gm"] = 0.5
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "RecYds/Gm"] = 3.5
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "Y/A"] = 1.5
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "RushAtt"] = 85
+        elif player['position'] == 'WR' or player['position'] == 'TE':
+            if dev_level != 'None':
+                rookie_data.loc[(rookie_data['Player'] == player['Player']), "DevTrait"] = random.choice(wr_dev_styles)
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "Tgt/Gm"] = 3
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "Rec/Gm"] = 2
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "RecYds/Gm"] = 18.5
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "RecTD/Gm"] = 0.1
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "Y/R"] = 3.5
+    else:
+        rookie_data.loc[(rookie_data['Player'] == player['Player']), "ProspectLevel"] = "Low"
+        dev_level = ""
+        level_num = random.randint(0, 10)
+        if level_num <= 5:
+            dev_level = 'None'
+        elif level_num <= 7:
+            dev_level = 'Slow'
+        elif level_num <= 8:
+            dev_level = 'Medium'
+        elif level_num <= 9:
+            dev_level = 'Fast'
+        else:
+            dev_level = 'Superstar'
+        rookie_data.loc[(rookie_data['Player'] == player['Player']), "DevSpeed"] = dev_level
+        if player['position'] == 'RB' or player['position'] == 'FB':
+            if dev_level != 'None':
+                rookie_data.loc[(rookie_data['Player'] == player['Player']), "DevTrait"] = random.choice(rb_dev_styles)
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "RushYds/Gm"] = 10
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "RushTD/Gm"] = 0.05
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "RushAtt/Gm"] = 2.5
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "Rec/Gm"] = 0.25
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "RecYds/Gm"] = 1.25
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "Y/A"] = 0.75
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "RushAtt"] = 43
+        elif player['position'] == 'WR' or player['position'] == 'TE':
+            if dev_level != 'None':
+                rookie_data.loc[(rookie_data['Player'] == player['Player']), "DevTrait"] = random.choice(wr_dev_styles)
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "Tgt/Gm"] = 1.5
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "Rec/Gm"] = 1
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "RecYds/Gm"] = 9.25
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "RecTD/Gm"] = 0.05
+            rookie_data.loc[(rookie_data['Player'] == player['Player']), "Y/R"] = 1.75
+
+missing_columns = [col for col in fantasy_data_2023.columns if col not in rookie_data.columns]
+for col in missing_columns:
+    rookie_data[col] = 0
+
+fantasy_data_2023 = pd.concat([fantasy_data_2023, rookie_data], ignore_index=True)
 
 player_teams = pd.read_csv("NFLTeams - Sheet1.csv")
 player_teams['Team'] = player_teams['Team'].map(complete_team_abbreviation_mapping)
@@ -414,7 +559,6 @@ fantasy_data_2023['GamesBoosted'] = 0
 fantasy_data_2023['Starting'] = "No"
 fantasy_data_2023['FantasyTeam'] = "FA"
 
-
 global draft_board
 draft_board = fantasy_data_2023.copy()
 
@@ -448,7 +592,7 @@ def get_gif_url(api_key, query):
 
 def round_robin_schedule(teams_by_num):
     if len(teams_by_num) % 2 != 0:
-        teams_by_num.append(None)  # Add a dummy team if the number of teams is odd
+        teams_by_num.append(None)
 
     n = len(teams_by_num)
     schedule = []
@@ -573,8 +717,14 @@ def home():
     return render_template('home.html')
 
 @app.route('/after_draft', methods=['GET', 'POST'])
-def show_teams():
-    return render_template('after_draft.html', teams=teams)
+def home_page():
+    global teams
+    global current_week
+    return render_template('after_draft.html', teams=teams, current_week=current_week)
+
+@app.route('/ViewTeams', methods=['GET', 'POST'])
+def view_teams():
+    return render_template('ViewTeams.html', teams=teams)
 
 @app.route('/TierList', methods=['GET','POST'])
 def view_tier_list():
@@ -628,7 +778,7 @@ def player_details(player_name):
             if player == player_name:
                 fantasy_team = team_num
         team_num+=1
-    return render_template('player_details.html', player_name=player_name, player_image=player_image, total_pts=player_data['TotalPts'], fantasy_team=fantasy_team, avg_points = player_data['AvgPts'])
+    return render_template('player_details.html', player_name=player_name, player_image=player_image, total_pts=round(player_data['TotalPts'], 1), fantasy_team=fantasy_team, avg_points = player_data['AvgPts'])
 
 
 def fetch_player_image(player_name):
@@ -648,6 +798,9 @@ def fetch_player_image(player_name):
 @app.route('/WaiverClaims', methods=['GET', 'POST'])
 def make_waiver_claim():
     global user_team
+    global waiver_order
+    global waiver_claims
+    waiver_claims = ["", "", "", "", "", "", "", ""]
     if request.method == 'POST':
         player_name = request.form['player_name']
         player = draft_board[draft_board['Player'] == player_name].to_dict('records')
@@ -700,10 +853,9 @@ def assign_waiver_claims():
             team_num = waiver_order.pop(claim_num)
             claim_num-=1
             waiver_order.append(team_num)
-            print(waiver_order)
             print(teams)
         claim_num+=1
-    return render_template('WaiverResults.html', teams=teams)
+    return render_template('WaiverResults.html', teams=teams, waiver_claims=waiver_claims)
 
 @app.route('/LineupChanges', methods=['GET', 'POST'])
 def set_lineup():
@@ -729,16 +881,19 @@ def set_lineup():
     return render_template('LineupChanges.html', qblist=qblist, rblist=rblist, wrlist=wrlist, players=players, current_week='Wk'+str(current_week+1), qb_players=qb_players, rb_players=rb_players, wr_players=wr_players)
 
 def pred_weekly_pts(player):
-        weekly_pred_pts = round(((fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "PredPts"].values[0]) / 17), 1)
+        weekly_pred_pts = round((fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "PredAvgPts"].values[0]), 1)
         opponent = str(fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, 'Wk'+str(current_week+1)].values[0])[1:]
-        if fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "position"].values[0] == 'RB':
-            defense_ranking = run_defense.loc[run_defense['Team'] == opponent, 'Rank'].values[0]
+        if opponent != 'YE':
+            if fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "position"].values[0] == 'RB':
+                defense_ranking = run_defense.loc[run_defense['Team'] == opponent, 'Rank'].values[0]
+            else:
+                defense_ranking = pass_defense.loc[pass_defense['Team'] == opponent, 'Rank'].values[0]
+            if defense_ranking < 16:
+                fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "weekly_pred_pts"].values[0]
+            else:
+                fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "weekly_pred_pts"].values[0] -= random.randint(0, 3)
         else:
-            defense_ranking = pass_defense.loc[pass_defense['Team'] == opponent, 'Rank'].values[0]
-        if defense_ranking < 16:
-            fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "weekly_pred_pts"].values[0]
-        else:
-            fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "weekly_pred_pts"].values[0] -= random.randint(0, 3)
+            fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "weekly_pred_pts"].values[0] = 0
         fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "weekly_pred_pts"] = weekly_pred_pts
 
 def auto_update_lineup():
@@ -757,13 +912,13 @@ def auto_update_lineup():
                 wrlist.append(player)
         pred_list = []
         for qb in qblist:
-            pred_list.append(fantasy_data_2023.loc[fantasy_data_2023['Player'] == qb, "weekly_pred_pts"].values[0])
+            pred_list.append(fantasy_data_2023.loc[fantasy_data_2023['Player'] == qb, "AvgPts"].values[0])
         for index in range(len(pred_list)-1):
             if pred_list[index] == max(pred_list):
                 fantasy_data_2023.loc[fantasy_data_2023['Player'] == qblist[index], "Starting"] = 'Yes'
         pred_list = []
         for rb in rblist:
-            pred_list.append(fantasy_data_2023.loc[fantasy_data_2023['Player'] == rb, "weekly_pred_pts"].values[0])
+            pred_list.append(fantasy_data_2023.loc[fantasy_data_2023['Player'] == rb, "AvgPts"].values[0])
 
         for x in range(2):
             max_index = pred_list.index(max(pred_list))
@@ -772,7 +927,7 @@ def auto_update_lineup():
 
         pred_list = []
         for wr in wrlist:
-            pred_list.append(fantasy_data_2023.loc[fantasy_data_2023['Player'] == wr, "weekly_pred_pts"].values[0])
+            pred_list.append(fantasy_data_2023.loc[fantasy_data_2023['Player'] == wr, "AvgPts"].values[0])
 
         for x in range(2):
             max_index = pred_list.index(max(pred_list))
@@ -829,7 +984,6 @@ def sim_week():
     dfteam_0 = pd.DataFrame()
     for team in teams:
         for player in team:
-            #print(fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "Starting"].values[0] == "Yes")
             if fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, "Starting"].values[0] == "Yes":
                 team_points[team_num]+=round(fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, str("Wk" + str(current_week)+"Pts")].values[0], 1)
                 team_weekly_points[team_num]+=round(fantasy_data_2023.loc[fantasy_data_2023['Player'] == player, str("Wk" + str(current_week)+"Pts")].values[0], 1)
@@ -844,7 +998,7 @@ def sim_week():
     update_winners()
     fantasy_data_2023 = fantasy_data_2023.sort_values(by='Wk' + str(current_week) + 'Pts', ascending=False)
     #print(fantasy_data_2023[['Player', 'RushYds/Gm', 'RushTD/Gm', 'RecYds/Gm', 'RecTD/Gm', 'Rec/Gm']].head(20))
-    return render_template('WeeklyStats.html', table=fantasy_data_2023[['Player', 'position', str("Wk" + str(current_week)+"Pts"), 'TotalPts', 'Injury', 'GameNotes', 'StarRating', 'GamesBoosted']].to_html(), dfteam_0=dfteam_0_html, team_wins=team_wins, current_week=str(current_week), intcurrent_week=int(current_week), matchups=schedule[current_week-1], team_points=team_points,team_weekly_points=team_weekly_points, players_points=players_points)
+    return render_template('WeeklyStats.html', table=fantasy_data_2023[['Player', 'Team', 'position', str("Wk" + str(current_week)+"Pts"), 'TotalPts', 'Injury', 'GameNotes', 'Starting']].to_html(), dfteam_0=dfteam_0_html, team_wins=team_wins, current_week=str(current_week), intcurrent_week=int(current_week), matchups=schedule[current_week-1], team_points=team_points,team_weekly_points=team_weekly_points, players_points=players_points)
 
 def update_winners():
     global schedule
@@ -1032,7 +1186,7 @@ def draft():
             # Redirect to the same route to handle auto-draft for computer teams
             return redirect(url_for('auto_draft_step'))
 
-    return render_template('draft.html', table=draft_board[['Player', 'position', 'Team', 'PredPts', 'PredAvgPts', 'StarRating']].to_html(), team=teams[user_team], draft_message=draft_message, drafted_players=drafted_players, gif_url=gif_url)
+    return render_template('draft.html', table=draft_board[['Player', 'position', 'Team', 'PredPts', 'PredAvgPts', 'StarRating', 'DevTrait', 'DevSpeed']].to_html(), team=teams[user_team], draft_message=draft_message, drafted_players=drafted_players, gif_url=gif_url)
 
 @app.route('/auto_draft_step')
 def auto_draft_step():
