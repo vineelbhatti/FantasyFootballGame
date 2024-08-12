@@ -429,112 +429,6 @@ wr_predictions = model_wr.predict(wrte_data[wrte_data['Year'] == 2023][features_
 wrte_data.loc[wrte_data['Year'] == 2023, 'PredAvgPts'] = wr_predictions
 wrte_data = wrte_data.sort_values(by='PredAvgPts', ascending=False)
 
-'''
-
-features_qb = ["wr_quality", "GoodTeammates", "RushYds/Gm", "PassYds/Gm", "PassTD/Gm", "Cmp%", "PassAtt", "GS"]
-target = "PPG"
-
-train_data_qb = qb_data[qb_data['Year'] != 2023]
-test_data_qb = qb_data[qb_data['Year'] == 2023]
-
-X_train_qb = train_data_qb[features_qb]
-y_train_qb = train_data_qb[target]
-X_test_qb = test_data_qb[features_qb]
-y_test_qb = test_data_qb[target]
-
-model_qb = RandomForestRegressor()
-
-model_qb.fit(X_train_qb, y_train_qb)
-
-y_pred_qb = model_qb.predict(X_test_qb)
-
-mae = mean_absolute_error(y_test_qb, y_pred_qb)
-mse = mean_squared_error(y_test_qb, y_pred_qb)
-
-print(f'QB Mean Absolute Error: {mae}')
-
-df_2023_predictions_qb = pd.DataFrame()
-df_2023_predictions_qb['y_test'] = y_test_qb
-df_2023_predictions_qb['y_pred'] = y_pred_qb
-
-X_2023 = qb_data[qb_data['Year'] == 2023][features_qb]
-y_2024_pred_qb = model_qb.predict(X_2023)
-qb_data.loc[qb_data['Year'] == 2023, 'PredAvgPts'] = y_2024_pred_qb
-
-qb_data = qb_data.sort_values('PredAvgPts', ascending=False)
-
-#############################################
-
-#These features are for RB
-features_rb = ["GoodTeammates", "RushYds/Gm", "RushTD/Gm", "Rec/Gm", "RecYds/Gm", "RushAtt/Gm", "Y/A", "RushAtt"]
-target = "PPG"
-
-train_data_rb = rbfb_data[rbfb_data['Year'] != 2023]
-test_data_rb = rbfb_data[rbfb_data['Year'] == 2023]
-
-X_train_rb = train_data_rb[features_rb]
-y_train_rb = train_data_rb[target]
-X_test_rb = test_data_rb[features_rb]
-y_test_rb = test_data_rb[target]
-
-model_rb = RandomForestRegressor()
-
-model_rb.fit(X_train_rb, y_train_rb)
-
-y_pred_rb = model_rb.predict(X_test_rb)
-
-mae_rb = mean_absolute_error(y_test_rb, y_pred_rb)
-
-print(f'RB Mean Absolute Error: {mae_rb}')
-
-df_2023_predictions_rb = pd.DataFrame()
-df_2023_predictions_rb['y_test_rb'] = y_test_rb
-df_2023_predictions_rb['y_pred_rb'] = y_pred_rb
-
-X_2023_rb = rbfb_data[rbfb_data['Year'] == 2023][features_rb]
-y_2024_pred_rb = model_rb.predict(X_2023_rb)
-rbfb_data.loc[rbfb_data['Year'] == 2023, 'PredAvgPts'] = y_2024_pred_rb
-
-rbfb_data = rbfb_data.sort_values('PredAvgPts', ascending=False)
-
-#############################################
-
-#These features are for WR
-features_wr = ["GoodTeammates", "Tgt/Gm", "Rec/Gm", "RecYds/Gm", "RecTD/Gm", "Y/R"]
-features_wr += ["Age"]
-target = "PPG"
-
-train_data_wr = wrte_data[wrte_data['Year'] != 2023]
-test_data_wr = wrte_data[wrte_data['Year'] == 2023]
-
-X_train_wr = train_data_wr[features_wr]
-y_train_wr = train_data_wr[target]
-X_test_wr = test_data_wr[features_wr]
-y_test_wr = test_data_wr[target]
-
-model_wr = RandomForestRegressor()
-
-model_wr.fit(X_train_wr, y_train_wr)
-
-y_pred_wr = model_wr.predict(X_test_wr)
-
-mae_wr = mean_absolute_error(y_test_wr, y_pred_wr)
-mse_wr = mean_squared_error(y_test_wr, y_pred_wr)
-
-print(f'WR Mean Absolute Error: {mae_wr}')
-
-df_2023_predictions_wr = pd.DataFrame()
-df_2023_predictions_wr['y_test_wr'] = y_test_wr
-df_2023_predictions_wr['y_pred_wr'] = y_pred_wr
-
-X_2023_wr = wrte_data[wrte_data['Year'] == 2023][features_wr]
-y_2024_pred_wr = model_wr.predict(X_2023_wr)
-wrte_data.loc[wrte_data['Year'] == 2023, 'PredAvgPts'] = y_2024_pred_wr
-
-wrte_data = wrte_data.sort_values('PredAvgPts', ascending=False)
-
-#######################################
-'''
 fantasy_data_2023 = fantasy_data_2023[fantasy_data_2023['Year'] == 2023]
 
 fantasy_data_2023 = fantasy_data_2023.merge(qb_data[['Player', 'Year', 'PredAvgPts']], on=['Player', 'Year'], how='left')
@@ -710,6 +604,12 @@ def check_boosts(df):
 
 teams_by_num = list(range(8))
 schedule = round_robin_schedule(teams_by_num)
+
+'''
+def upgrade_rookies():
+    for index, row in fantasy_data_2023.iterrows():
+        if row['DevTrait'] == 'Gunslinger':
+        '''
 
 
 @app.route('/', methods=['GET', 'POST'])
