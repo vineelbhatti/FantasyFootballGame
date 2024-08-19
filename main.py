@@ -207,6 +207,8 @@ rookie_data['Year'] = 2023
 rookie_data['DevTrait'] = "None"
 rookie_data['DevSpeed'] = "N/A"
 
+rookie_data['Team'] = rookie_data['Team'].map(fix_abv).fillna(rookie_data['Team'])
+
 dev_levels = ['None', 'Slow', 'Medium', 'Fast', 'Superstar']
 qb_dev_styles = ['Gunslinger', 'Improviser', 'Precision Passer', 'Escape Artist', 'Field General']
 rb_dev_styles = ['Workhorse', 'Explosive Rusher', 'Backfield Reciever', 'Balanced Back', 'Unstoppable Force']
@@ -605,11 +607,26 @@ def check_boosts(df):
 teams_by_num = list(range(8))
 schedule = round_robin_schedule(teams_by_num)
 
-'''
 def upgrade_rookies():
     for index, row in fantasy_data_2023.iterrows():
         if row['DevTrait'] == 'Gunslinger':
-        '''
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassTD/Gm"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassTD/Gm"].values[0]
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassYds/Gm"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassYds/Gm"].values[0]
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassAtt"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassAtt"].values[0]
+        if row['DevTrait'] == 'Improviser':
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "RushYds/Gm"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "RushYds/Gm"].values[0]
+        if row['DevTrait'] == 'Precision Passer':
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "Cmp%"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "Cmp%"].values[0]
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassYds/Gm"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassYds/Gm"].values[0]
+        if row['DevTrait'] == 'Escape Artist':
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "RushYds/Gm"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "RushYds/Gm"].values[0]
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassYds/Gm"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassYds/Gm"].values[0]
+        if row['DevTrait'] == 'Field General':
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "Cmp%"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "Cmp%"].values[0]
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassYds/Gm"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassYds/Gm"].values[0]
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassTD/Gm"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassTD/Gm"].values[0]
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "RushYds/Gm"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "RushYds/Gm"].values[0]
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassAtt"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassAtt"].values[0]
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -624,7 +641,46 @@ def home_page():
 
 @app.route('/ViewTeams', methods=['GET', 'POST'])
 def view_teams():
-    return render_template('ViewTeams.html', teams=teams)
+    team_colors = {
+        'ARI': {'primary': '#97233F', 'secondary': '#FFB612'},
+        'ATL': {'primary': '#A71930', 'secondary': '#000000'},
+        'BAL': {'primary': '#241773', 'secondary': '#9E7C0C'},
+        'BUF': {'primary': '#00338D', 'secondary': '#C60C30'},
+        'CAR': {'primary': '#0085CA', 'secondary': '#101820'},
+        'CHI': {'primary': '#C83803', 'secondary': '#0B162A'},
+        'CIN': {'primary': '#FB4F14', 'secondary': '#000000'},
+        'CLE': {'primary': '#311D00', 'secondary': '#FF3C00'},
+        'DAL': {'primary': '#041E42', 'secondary': '#869397'},
+        'DEN': {'primary': '#FB4F14', 'secondary': '#002244'},
+        'DET': {'primary': '#0076B6', 'secondary': '#B0B7BC'},
+        'GB': {'primary': '#203731', 'secondary': '#FFB612'},
+        'HOU': {'primary': '#03202F', 'secondary': '#A71930'},
+        'IND': {'primary': '#002C5F', 'secondary': '#A5ACAF'},
+        'JAX': {'primary': '#006778', 'secondary': '#D7A22A'},
+        'KC': {'primary': '#E31837', 'secondary': '#FFB81C'},
+        'LV': {'primary': '#A5ACAF', 'secondary': '#000000'},
+        'LAC': {'primary': '#0073CF', 'secondary': '#FFC20E'},
+        'LAR': {'primary': '#003594', 'secondary': '#FFA300'},
+        'MIA': {'primary': '#008E97', 'secondary': '#FC4C02'},
+        'MIN': {'primary': '#4F2683', 'secondary': '#FFC62F'},
+        'NE': {'primary': '#002244', 'secondary': '#C60C30'},
+        'NO': {'primary': '#D3BC8D', 'secondary': '#101820'},
+        'NYG': {'primary': '#0B2265', 'secondary': '#A71930'},
+        'NYJ': {'primary': '#125740', 'secondary': '#000000'},
+        'PHI': {'primary': '#004C54', 'secondary': '#A5ACAF'},
+        'PIT': {'primary': '#FFB612', 'secondary': '#101820'},
+        'SF': {'primary': '#AA0000', 'secondary': '#B3995D'},
+        'SEA': {'primary': '#002244', 'secondary': '#69BE28'},
+        'TB': {'primary': '#D50A0A', 'secondary': '#FF7900'},
+        'TEN': {'primary': '#4B92DB', 'secondary': '#C8102E'},
+        'WSH': {'primary': '#773141', 'secondary': '#FFB612'}
+    }
+    players_dict = fantasy_data_2023.set_index('Player')['Team'].to_dict()
+    player_images = {}
+    players_not_in_draft = fantasy_data_2023[~fantasy_data_2023['Player'].isin(draft_board['Player'])]
+    for player_name in players_not_in_draft['Player']:
+        player_images[player_name] = fetch_player_image(player_name)
+    return render_template('ViewTeams.html', teams=teams, team_colors=team_colors, players_dict=players_dict, player_images=player_images, fantasy_data_2023=fantasy_data_2023)
 
 @app.route('/TierList', methods=['GET','POST'])
 def view_tier_list():
@@ -687,13 +743,22 @@ def fetch_player_image(player_name):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     }
-    response = requests.get(search_url, headers=headers)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    image = soup.find('img', {'class': 'mimg'})
-    if image:
-        return image['src']
-    else:
+
+    def get_image_src(soup):
+        images = soup.find_all('img', {'class': 'mimg'})
+        for image in images:
+            src = image.get('src')
+            if src and not src.startswith('data:'):
+                return src
         return None
+    for page in range(1, 4):
+        response = requests.get(f"{search_url}&first={page * 35 + 1}",
+                                headers=headers)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        image_src = get_image_src(soup)
+        if image_src:
+            return image_src
+    return None
 
 @app.route('/WaiverClaims', methods=['GET', 'POST'])
 def make_waiver_claim():
@@ -897,6 +962,7 @@ def sim_week():
         lambda x: x[['Player', 'Wk' + str(current_week) + 'Pts']].to_dict(orient='records')).to_dict()
     update_winners()
     fantasy_data_2023 = fantasy_data_2023.sort_values(by='Wk' + str(current_week) + 'Pts', ascending=False)
+    #upgrade_rookies()
     #print(fantasy_data_2023[['Player', 'RushYds/Gm', 'RushTD/Gm', 'RecYds/Gm', 'RecTD/Gm', 'Rec/Gm']].head(20))
     return render_template('WeeklyStats.html', table=fantasy_data_2023[['Player', 'Team', 'position', str("Wk" + str(current_week)+"Pts"), 'TotalPts', 'Injury', 'GameNotes', 'Starting']].to_html(), dfteam_0=dfteam_0_html, team_wins=team_wins, current_week=str(current_week), intcurrent_week=int(current_week), matchups=schedule[current_week-1], team_points=team_points,team_weekly_points=team_weekly_points, players_points=players_points)
 
