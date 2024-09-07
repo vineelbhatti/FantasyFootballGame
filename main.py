@@ -608,25 +608,34 @@ teams_by_num = list(range(8))
 schedule = round_robin_schedule(teams_by_num)
 
 def upgrade_rookies():
+    level_impact = 0
     for index, row in fantasy_data_2023.iterrows():
+        if row['DevSpeed'] == 'Slow':
+            level_impact = 1
+        if row['DevSpeed'] == 'Medium':
+            level_impact = 1.5
+        if row['DevSpeed'] == 'Fast':
+            level_impact = 2
+        if row['DevSpeed'] == 'Superstar':
+            level_impact = 3
         if row['DevTrait'] == 'Gunslinger':
-            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassTD/Gm"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassTD/Gm"].values[0]
-            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassYds/Gm"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassYds/Gm"].values[0]
-            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassAtt"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassAtt"].values[0]
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassTD/Gm"] += random.uniform(1.1, 1.3*level_impact)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassTD/Gm"].values[0]
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassYds/Gm"] += random.uniform(1.1, 1.3*level_impact)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassYds/Gm"].values[0]
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassAtt"] += random.uniform(1.1, 1.3*level_impact)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassAtt"].values[0]
         if row['DevTrait'] == 'Improviser':
-            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "RushYds/Gm"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "RushYds/Gm"].values[0]
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "RushYds/Gm"] += random.uniform(1.1, 1.3*level_impact)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "RushYds/Gm"].values[0]
         if row['DevTrait'] == 'Precision Passer':
-            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "Cmp%"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "Cmp%"].values[0]
-            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassYds/Gm"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassYds/Gm"].values[0]
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "Cmp%"] += random.uniform(1.1, 1.3*level_impact)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "Cmp%"].values[0]
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassYds/Gm"] += random.uniform(1.1, 1.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassYds/Gm"].values[0]
         if row['DevTrait'] == 'Escape Artist':
-            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "RushYds/Gm"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "RushYds/Gm"].values[0]
-            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassYds/Gm"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassYds/Gm"].values[0]
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "RushYds/Gm"] += random.uniform(1.1, 1.3*level_impact)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "RushYds/Gm"].values[0]
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassYds/Gm"] += random.uniform(1.1, 1.3*level_impact)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassYds/Gm"].values[0]
         if row['DevTrait'] == 'Field General':
-            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "Cmp%"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "Cmp%"].values[0]
-            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassYds/Gm"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassYds/Gm"].values[0]
-            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassTD/Gm"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassTD/Gm"].values[0]
-            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "RushYds/Gm"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "RushYds/Gm"].values[0]
-            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassAtt"] += random.uniform(0.1, 0.3)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassAtt"].values[0]
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "Cmp%"] += random.uniform(1.1, 1.3*level_impact)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "Cmp%"].values[0]
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassYds/Gm"] += random.uniform(1.1, 1.3*level_impact)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassYds/Gm"].values[0]
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassTD/Gm"] += random.uniform(1.1, 1.3*level_impact)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassTD/Gm"].values[0]
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "RushYds/Gm"] += random.uniform(1.1, 1.3*level_impact)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "RushYds/Gm"].values[0]
+            fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassAtt"] += random.uniform(1.1, 1.3*level_impact)*fantasy_data_2023.loc[(fantasy_data_2023['Player'] == row['Player']), "PassAtt"].values[0]
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -676,11 +685,7 @@ def view_teams():
         'WSH': {'primary': '#773141', 'secondary': '#FFB612'}
     }
     players_dict = fantasy_data_2023.set_index('Player')['Team'].to_dict()
-    player_images = {}
-    players_not_in_draft = fantasy_data_2023[~fantasy_data_2023['Player'].isin(draft_board['Player'])]
-    for player_name in players_not_in_draft['Player']:
-        player_images[player_name] = fetch_player_image(player_name)
-    return render_template('ViewTeams.html', teams=teams, team_colors=team_colors, players_dict=players_dict, player_images=player_images, fantasy_data_2023=fantasy_data_2023)
+    return render_template('ViewTeams.html', teams=teams, team_colors=team_colors, players_dict=players_dict, fantasy_data_2023=fantasy_data_2023)
 
 @app.route('/TierList', methods=['GET','POST'])
 def view_tier_list():
@@ -813,6 +818,7 @@ def assign_waiver_claims():
     for claim in waiver_claims:
         if (draft_board['Player'] == claim).any():
             teams[waiver_order[claim_num]].append(claim)
+            fantasy_data_2023.loc[fantasy_data_2023['Player'] == claim, "FantasyTeam"] = waiver_order[claim_num]
             successful_waivers.append(draft_board['Player'])
             draft_board = draft_board[draft_board.Player != claim]
             team_num = waiver_order.pop(claim_num)
@@ -828,6 +834,7 @@ def set_lineup():
     qblist = []
     rblist = []
     wrlist = []
+    fantasy_data_2023['Starting'] = "No"
     for index, row in fantasy_data_2023.iterrows():
         player = row['Player']
         pred_weekly_pts(player)
@@ -878,9 +885,9 @@ def auto_update_lineup():
         pred_list = []
         for qb in qblist:
             pred_list.append(fantasy_data_2023.loc[fantasy_data_2023['Player'] == qb, "AvgPts"].values[0])
-        for index in range(len(pred_list)-1):
-            if pred_list[index] == max(pred_list):
-                fantasy_data_2023.loc[fantasy_data_2023['Player'] == qblist[index], "Starting"] = 'Yes'
+        max_index = pred_list.index(max(pred_list))
+        fantasy_data_2023.loc[fantasy_data_2023['Player'] == qblist[max_index], "Starting"] = 'Yes'
+
         pred_list = []
         for rb in rblist:
             pred_list.append(fantasy_data_2023.loc[fantasy_data_2023['Player'] == rb, "AvgPts"].values[0])
@@ -958,11 +965,11 @@ def sim_week():
         team_num+=1
     dfteam_0 = dfteam_0[['Player', str("Wk" + str(current_week)+"Pts"), 'TotalPts', 'Injury', 'GameNotes', 'Starting']]
     dfteam_0_html = dfteam_0.to_html(classes='table table-striped', index=False)
-    players_points = fantasy_data_2023.groupby('FantasyTeam').apply(
+    players_points = fantasy_data_2023[fantasy_data_2023['Starting'] == 'Yes'].groupby('FantasyTeam').apply(
         lambda x: x[['Player', 'Wk' + str(current_week) + 'Pts']].to_dict(orient='records')).to_dict()
     update_winners()
     fantasy_data_2023 = fantasy_data_2023.sort_values(by='Wk' + str(current_week) + 'Pts', ascending=False)
-    #upgrade_rookies()
+    upgrade_rookies()
     #print(fantasy_data_2023[['Player', 'RushYds/Gm', 'RushTD/Gm', 'RecYds/Gm', 'RecTD/Gm', 'Rec/Gm']].head(20))
     return render_template('WeeklyStats.html', table=fantasy_data_2023[['Player', 'Team', 'position', str("Wk" + str(current_week)+"Pts"), 'TotalPts', 'Injury', 'GameNotes', 'Starting']].to_html(), dfteam_0=dfteam_0_html, team_wins=team_wins, current_week=str(current_week), intcurrent_week=int(current_week), matchups=schedule[current_week-1], team_points=team_points,team_weekly_points=team_weekly_points, players_points=players_points)
 
