@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Stats</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #388e3c;
+            margin-bottom: 20px;
+        }
+
+        .matchup {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #c8e6c9;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .matchup:hover {
+            background: #e0f2f1;
+        }
+
+        .matchup-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .team {
+            flex: 1;
+            text-align: center;
+        }
+
+        .team-left {
+            border-right: 2px solid #388e3c;
+            padding-right: 10px;
+        }
+
+        .team-right {
+            padding-left: 10px;
+        }
+
+        .vs {
+            font-size: 2em;
+            font-weight: bold;
+            color: #388e3c;
+        }
+
+        .details {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f1f8e9;
+            border-radius: 4px;
+            border: 1px solid #c8e6c9;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .details ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .details li {
+            padding: 5px 0;
+        }
+
+        .details .team-details {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .details .team-details > div {
+            flex: 1;
+            margin: 0 10px;
+        }
+
+        .table-container {
+            margin-top: 20px;
+        }
+
+        .table-container table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-container th, .table-container td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #c8e6c9;
+        }
+
+        .table-container th {
+            background-color: #388e3c;
+            color: #fff;
+        }
+
+        .table-container tr:hover {
+            background-color: #e0f2f1;
+        }
+
+        .info {
+            margin-top: 20px;
+        }
+
+        .info p {
+            padding: 10px;
+            background-color: #f1f8e9;
+            border: 1px solid #c8e6c9;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #388e3c;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #2e7d32;
+        }
+    </style>
+    <script>
+        function toggleDetails(matchupIndex) {
+            var detailsDiv = document.getElementById('details-' + matchupIndex);
+            if (detailsDiv.style.display === 'none' || detailsDiv.style.display === '') {
+                detailsDiv.style.display = 'block';
+            } else {
+                detailsDiv.style.display = 'none';
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Weekly Stats</h1>
+
+        {% for matchup in matchups %}
+        <div class="matchup" onclick="toggleDetails({{ loop.index0 }})">
+            <div class="matchup-content">
+                <div class="team team-left">
+                    <p>Team {{ matchup[0] }}: {{ team_weekly_points[matchup[0]] }} points</p>
+                    <p>{{ team_wins[matchup[0]] }} - {{ intcurrent_week - team_wins[matchup[0]] }}</p>
+                </div>
+                <div class="vs"></div>
+                <div class="team team-right">
+                    <p>Team {{ matchup[1] }}: {{ team_weekly_points[matchup[1]] }} points</p>
+                    <p>{{ team_wins[matchup[1]] }} - {{ intcurrent_week - team_wins[matchup[1]] }}</p>
+                </div>
+            </div>
+            <div class="details" id="details-{{ loop.index0 }}">
+                <div class="team-details">
+                    <div>
+                        <p><strong>Team {{ matchup[0] }} Players' Points:</strong></p>
+                        <ul>
+                            {% for player in players_points[matchup[0]] %}
+                            <li>{{ player.Player }}: {{ player['Wk' + current_week + 'Pts'] }} points</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div>
+                        <p><strong>Team {{ matchup[1] }} Players' Points:</strong></p>
+                        <ul>
+                            {% for player in players_points[matchup[1]] %}
+                            <li>{{ player.Player }}: {{ player['Wk' + current_week + 'Pts'] }} points</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="table-container">
+            {{ dfteam_0|safe }}
+        </div>
+
+        <div class="table-container">
+            {{ table|safe }}
+        </div>
+
+        <div class="info">
+            {% if new_injury %}
+                <p>{{ new_injury }}</p>
+            {% endif %}
+            {% if weather_note %}
+                <p>{{ weather_note }}</p>
+            {% endif %}
+        </div>
+    </div>
+    <button onclick="location.href='/after_draft'">Home</button>
+    <button onclick="location.href='/WeeklyStats'">Sim Next Week</button>
+    <button onclick="location.href='/LineupChanges'">Set Lineup</button>
+    <button onclick="location.href='/TierList'">Tier List</button>
+    <button onclick="location.href='/WaiverClaims'">Waiver Claims</button>
+<button onclick="location.href='/WaiverResults'">View Waiver Results</button>
+</body>
+</html>

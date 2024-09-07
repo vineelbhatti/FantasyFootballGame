@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Draft Room</title>
+</head>
+<body>
+<h2>Your Team</h2>
+    <ul id="team-list" class="team-list">
+        {% for player in team %}
+        <li>{{ player['Player'] }}</li>
+        {% endfor %}
+    </ul>
+<div class="draft-form">
+<form method="POST" action="/">
+        <label for="pick">Enter Player Name:</label>
+        <input type="text" id="player_name" name="player_name">
+        <input type="submit" value="Draft Player">
+    </form>
+        </div>
+<div class="gif-container" id="gif-container">
+{% if gif_url %}
+    <img src="{{ gif_url }}" alt="Player GIF">
+    {% endif %}
+    </div>
+</body>
+</html>

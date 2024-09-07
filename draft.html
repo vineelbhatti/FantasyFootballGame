@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draft Board</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 1200px;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .header {
+            background-color: #343a40;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+            width: 100%;
+        }
+        .content {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .table-container, .drafted-players {
+            flex: 1;
+            margin: 10px;
+        }
+        .table-container {
+            min-width: 300px;
+        }
+        .drafted-players {
+            min-width: 200px;
+        }
+        .drafted-players-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .highlight1 {
+            background-color: lightblue;
+        }
+        .highlight2 {
+            background-color: lightgreen;
+        }
+        .highlight3 {
+            background-color: lightcoral;
+        }
+        table {
+            cursor: pointer;
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        .draft-form {
+            margin-top: 20px;
+            width: 100%;
+            text-align: center;
+        }
+        .draft-form input[type="text"] {
+            padding: 10px;
+            width: 60%;
+            max-width: 400px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .draft-form input[type="submit"] {
+            background-color: #28a745;
+            color: #ffffff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .draft-form input[type="submit"]:hover {
+            background-color: #218838;
+        }
+        .gif-container {
+            width: 100%;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .gif-container img {
+            max-width: 100%;
+            height: auto;
+        }
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            min-width: 200px;
+            margin: 10px;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Draft Board</h1>
+        </div>
+        <div class="content">
+            <div class="table-container" id="table-container">
+                {{ table|safe }}
+            </div>
+            <div class="sidebar">
+                <div class="draft-form">
+                    <form method="POST" action="{{ url_for('draft') }}">
+                        <label for="player_name">Enter Player Name:</label>
+                        <input type="text" id="player_name" name="player_name">
+                        <input type="submit" value="Draft Player">
+                    </form>
+                    {% if draft_message %}
+                    <p class="draft-message">{{ draft_message }}</p>
+                    {% endif %}
+                </div>
+                <div class="drafted-players">
+                    <h2>Drafted Players</h2>
+                    <ul id="drafted-players-list" class="drafted-players-list">
+                        {% for player in drafted_players %}
+                        <li class="highlight{{ loop.index % 3 + 1 }}">{{ player }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% if team %}
+        <h2>Your Team</h2>
+        <ul>
+            {% for player in team %}
+            <li>{{ player }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <div class="gif-container" id="gif-container">
+            <!-- Space left for GIF to show up when a player is drafted -->
+            {% if gif_url %}
+            <img id="gif" src="{{ gif_url }}" alt="GIF will appear here" style="max-width: 100%;">
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

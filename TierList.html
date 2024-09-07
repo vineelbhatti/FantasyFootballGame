@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Star Ratings</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 20px auto;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        h2 {
+            background-color: #2e7d32;
+            color: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .player-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            list-style-type: none;
+            padding: 0;
+        }
+        .player-list li {
+            margin: 5px;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+        }
+        .star-5 { background-color: #66bb6a; }
+        .star-4 { background-color: #81c784; }
+        .star-3 { background-color: #a5d6a7; }
+        .star-2 { background-color: #c8e6c9; }
+        .star-1 { background-color: #e8f5e9; }
+    </style>
+</head>
+<body>
+    <div class="container">
+    {% for star in range(5, 0, -1) %}
+        <h2 class="star-{{ star }}">{{ star }}-Star Players</h2>
+        <ul class="player-list">
+        {% for player in players[star] %}
+            <li class="star-{{ star }}" style="background-color: {{ team_colors[teams[player]]['primary'] }}; color: {{ team_colors[teams[player]]['secondary'] }};">
+                <a href="{{ url_for('player_details', player_name=player) }}" style="color: inherit; text-decoration: none;">{{ player }}</a>
+            </li>
+        {% endfor %}
+        </ul>
+    {% endfor %}
+    </div>
+<button onclick="location.href='/after_draft'">Home</button>
+</body>
+</html>

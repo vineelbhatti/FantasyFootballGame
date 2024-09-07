@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy Football Home</title>
+    <style>
+        body {
+            background-color: #2E8B57; /* Green background */
+            font-family: Arial, sans-serif;
+            color: #FFFFFF;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        h1 {
+            padding: 20px;
+            margin: 0;
+            background-color: #006400; /* Darker green for header */
+            border-bottom: 2px solid #FFFFFF;
+        }
+        .button-container {
+            margin: 50px auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 400px;
+        }
+        button {
+            background-color: #32CD32; /* Lime green buttons */
+            color: #FFFFFF;
+            border: none;
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #228B22; /* Darker green on hover */
+        }
+        @media (min-width: 600px) {
+            .button-container {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            button {
+                margin: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Fantasy Football Home</h1>
+    <div class="button-container">
+        <button onclick="location.href='/WeeklyStats'">Sim Week {{ current_week+1 }}</button>
+        <button onclick="location.href='/LineupChanges'">Set Lineup</button>
+        <button onclick="location.href='/TierList'">Tier List</button>
+        <button onclick="location.href='/WaiverClaims'">Waiver Claims</button>
+        <button onclick="location.href='/ViewTeams'">View Teams</button>
+    </div>
+</body>
+</html>

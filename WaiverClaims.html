@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waiver Claims</title>
+    <style>
+        body {
+            background-color: #F5F5F5; /* Light gray background */
+            font-family: Arial, sans-serif;
+            color: #333333; /* Dark gray text */
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        h1 {
+            padding: 20px;
+            margin: 0;
+            background-color: #006400; /* Darker green for header */
+            color: #FFFFFF;
+        }
+        form {
+            margin: 30px auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 600px;
+            background-color: #FFFFFF; /* White background for the form */
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+        label {
+            font-size: 18px;
+            color: #006400; /* Dark green for labels */
+            margin-bottom: 10px;
+            display: block;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #CCCCCC;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        input[type="submit"] {
+            background-color: #228B22; /* Medium green button */
+            color: #FFFFFF;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+        input[type="submit"]:hover {
+            background-color: #006400; /* Darker green on hover */
+        }
+        .table-container {
+            margin: 30px auto;
+            width: 90%;
+            max-width: 1200px;
+            text-align: center;
+            background-color: #FFFFFF;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #CCCCCC;
+            text-align: left;
+            font-size: 16px;
+        }
+        th {
+            background-color: #228B22; /* Medium green for table header */
+            color: #FFFFFF;
+        }
+        tr:nth-child(even) {
+            background-color: #F0F0F0; /* Light gray for even rows */
+        }
+        tr:hover {
+            background-color: #D3D3D3; /* Light gray hover effect */
+        }
+        button {
+            background-color: #32CD32; /* Lime green button */
+            color: #FFFFFF;
+            border: none;
+            padding: 15px 30px;
+            margin: 20px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #228B22; /* Darker green on hover */
+        }
+    </style>
+</head>
+<body>
+    <h1>Waiver Claims</h1>
+    <form method="POST">
+        <label for="player_name">Enter Player Name:</label>
+        <input type="text" id="player_name" name="player_name">
+        <input type="submit" value="Submit Waiver Claim">
+    </form>
+    <div class="table-container" id="table-container">
+        {{ table|safe }}
+    </div>
+    <button onclick="location.href='/after_draft'">Home</button>
+</body>
+</html>

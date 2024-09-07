@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Waiver Results</title>
+</head>
+<body>
+{% for team in teams %}
+        <p>{{ team }}</p>
+        {% endfor %}
+
+{% for claim in waiver_claims %}
+        <p>{{ claim }}</p>
+        {% endfor %}
+
+<button onclick="location.href='/after_draft'">Home</button>
+
+</body>
+</html>
