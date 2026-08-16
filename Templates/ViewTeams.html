@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}League Rosters · Sunday Studio{% endblock %}
+{% block content %}
+<section class="hero"><p class="eyebrow">League rosters</p><h1>Every team, one view.</h1><p class="lede">Review roster construction across the league before making your next move.</p></section>
+<section class="team-grid">
+{% for team in teams %}<article class="team-card"><h2>Team {{ loop.index }}</h2>{% if team %}{% for player in team %}{% set player_team = players_dict.get(player, '') %}<div class="roster-player"><span>{{ player }}</span><span class="pill">{{ player_team }}</span></div>{% endfor %}{% else %}<div class="roster-player muted">No players drafted</div>{% endif %}</article>{% endfor %}
+</section>
+{% endblock %}

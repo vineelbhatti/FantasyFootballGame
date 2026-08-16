@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 import random
 import time
 import requests
@@ -14,7 +15,9 @@ from flask_pymongo import PyMongo
 
 app = Flask(__name__)
 
-GIPHY_API_KEY = 'Ctxh2h5PyG5btxvRF3LoBeTjj5nmrnQJ'
+GIPHY_API_KEY = os.environ.get("GIPHY_API_KEY")
+if not GIPHY_API_KEY:
+  raise RuntimeError("GIPHY_API_KEY must be set in the environment before starting the application.")
 
 fantasy_data_2023 = pd.read_csv("FantasyData2023.csv")
 

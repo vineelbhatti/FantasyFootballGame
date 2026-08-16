@@ -1,15 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>After Draft</title>
-</head>
-<body>
-{% for team in teams %}
-        <p>{{ team }}</p>
-        {% endfor %}
-<h1>Draft Room</h1>
-    <button onclick="location.href='/WeeklyStats'">Sim Week 1</button>
-<button onclick="location.href='/LineupChanges'">Set Lineup</button>
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}League Hub · Sunday Studio{% endblock %}
+{% block content %}
+<section class="hero">
+    <p class="eyebrow">League hub</p>
+    <h1>Week {{ current_week + 1 }} is ready.</h1>
+    <p class="lede">Make your lineup decisions, work the waiver wire, and run the next slate when you are ready.</p>
+</section>
+<section class="hub-grid">
+    <a class="hub-link" href="{{ url_for('sim_week') }}"><span class="icon">WK</span><h2>Simulate Week {{ current_week + 1 }}</h2><p>Run all matchups and update the league table.</p></a>
+    <a class="hub-link" href="{{ url_for('set_lineup') }}"><span class="icon">LU</span><h2>Set lineup</h2><p>Review projections and choose your starters.</p></a>
+    <a class="hub-link" href="{{ url_for('view_tier_list') }}"><span class="icon">TL</span><h2>Tier list</h2><p>Browse players grouped by star rating.</p></a>
+    <a class="hub-link" href="{{ url_for('make_waiver_claim') }}"><span class="icon">WA</span><h2>Waiver wire</h2><p>Submit a claim and compare free-agent projections.</p></a>
+    <a class="hub-link" href="{{ url_for('view_teams') }}"><span class="icon">TM</span><h2>League rosters</h2><p>See every fantasy team at a glance.</p></a>
+    <a class="hub-link" href="{{ url_for('draft') }}"><span class="icon">DR</span><h2>Draft room</h2><p>Return to the board and manage your roster.</p></a>
+</section>
+{% endblock %}

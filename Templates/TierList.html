@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Tier List · Sunday Studio{% endblock %}
+{% block content %}
+<section class="hero"><p class="eyebrow">Player tiers</p><h1>Find the difference-makers.</h1><p class="lede">Players are grouped by their current star rating. Select one to open their profile.</p></section>
+{% for star in range(5, 0, -1) %}
+<section class="tier"><div class="tier-header"><h2>{{ star }}-star players</h2><span class="pill">{{ players[star]|length }} players</span></div><div class="player-pills">{% for player in players[star] %}{% set player_team = teams.get(player, '') %}{% set color = team_colors.get(player_team, {'primary': '#3f72ff'}) %}<a class="player-pill" href="{{ url_for('player_details', player_name=player) }}" style="background:{{ color['primary'] }}">{{ player }}</a>{% else %}<p class="muted">No players in this tier.</p>{% endfor %}</div></section>
+{% endfor %}
+{% endblock %}
